@@ -21,6 +21,15 @@
   insert into user values (1,'7698627','123456');
   insert into user values (2,'123456','123456');
 ```
-
+# edit the mysql's config in StringConstants at server project
+```java
+  public class StringConstants {
+  
+      public static final String URL = "jdbc:mysql://localhost:3306/chat";
+      public static final String USERNAME = "root";
+      public static final String PASSWORD = "root";
+  
+  }
+```
 # then run TcpServer
 # and then run LoginUI
