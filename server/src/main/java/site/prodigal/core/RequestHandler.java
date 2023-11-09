@@ -37,8 +37,8 @@ public class RequestHandler {
     }
 
 
-    public static Object handle(String path,Action action,Object ...params) throws InvocationTargetException, IllegalAccessException {
-        String key = path.substring(1);
+    public static Object handle(Action action) throws InvocationTargetException, IllegalAccessException {
+        String key = action.getPath().substring(1);
         Method method = METHOD.get(key);
         int length = method.getParameterTypes().length;
 
@@ -53,7 +53,7 @@ public class RequestHandler {
                 ParameterizedType parameterizedType = (ParameterizedType) type;
                 klass = (Class<?>) parameterizedType.getRawType();
             }
-            covertParams[i] = Protocol.OBJECT_MAPPER.convertValue(params[i], klass);
+            covertParams[i] = Protocol.OBJECT_MAPPER.convertValue(action.getParams()[i], klass);
         }
         action.setParams(covertParams);
         return method.invoke(OBJS.get(key), covertParams);

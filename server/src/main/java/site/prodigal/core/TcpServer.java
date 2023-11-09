@@ -33,7 +33,7 @@ public class TcpServer {
                         System.out.println("客户端发送: " + inputLine);
                         Action action = (Action) Protocol.toObject(inputLine,Action.class);
 //                        System.out.println(action);
-                        Object handle = RequestHandler.handle(action.getPath(),action,action.getParams());
+                        Object handle = RequestHandler.handle(action);
 
                         if ("/login".equals(action.getPath()) && (Boolean)handle){
                             users.put((String) action.getParams()[0],out);

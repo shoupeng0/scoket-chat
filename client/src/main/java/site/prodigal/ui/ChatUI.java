@@ -84,8 +84,8 @@ public class ChatUI {
                 }
                 Action action = new Action("/insertRecord",userList.getSelectedValue(),new Object[]{new ChatRecord(null,username,userList.getSelectedValue(),messageField.getText())});
                 client.sendMsg(Protocol.toJsonStr(action));
-                messageField.setText("");
                 chatArea.append("我: " + messageField.getText() + "\n");
+                messageField.setText("");
             }
         });
 
