@@ -32,22 +32,31 @@ public class TcpServer {
                     while ((inputLine = in.readLine()) != null) {
                         System.out.println("客户端发送: " + inputLine);
                         Action action = (Action) Protocol.toObject(inputLine,Action.class);
-//                        System.out.println(action);
+                        //处理请求
                         Object handle = RequestHandler.handle(action);
 
+                        //登录请求特殊处理
                         if ("/login".equals(action.getPath()) && (Boolean)handle){
                             users.put((String) action.getParams()[0],out);
-//                            System.out.println(users);
                         }
 
-                        //处理消息请求
+                        //处理消息发送请求
                         if (ObjectUtils.isNotEmpty(action.getDestination())) {
-                            if (users.containsKey(action.getDestination())) {
-                                // 发送消息给目标用户
-                                users.get(action.getDestination()).println(Protocol.toJsonStr(action.getParams()[0]));
+                            //TODO 添加新的字段来判断是群聊消息还是私发消息
+                            if("测试群聊".equals(action.getDestination())){
+                                users.forEach((k,v)->{
+                                    // 发送消息给目标用户
+                                    System.out.println(v);
+                                    v.println(Protocol.toJsonStr(action.getParams()[0]));
+                                });
                             }else {
-                                // 发送消息给自己
-                                out.println(Protocol.toJsonStr(action.getParams()[0]));
+                                if (users.containsKey(action.getDestination())) {
+                                    // 发送消息给目标用户
+                                    users.get(action.getDestination()).println(Protocol.toJsonStr(action.getParams()[0]));
+                                }else {
+                                    // 发送消息给自己
+                                    out.println(Protocol.toJsonStr(action.getParams()[0]));
+                                }
                             }
 
                         }else //处理正常请求

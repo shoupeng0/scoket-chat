@@ -74,10 +74,11 @@ public class TcpClient {
                         ChatRecord record = (ChatRecord) Protocol.toObject(message.replace("\r\n",""), ChatRecord.class);
 
                         //排除自己发给自己的消息
-                        if (!record.getSendUsername().equals(record.getReceiveUsername())){
+                        if (!record.getSendUsername().equals(currentUser)){
 
                             //渲染到聊天界面上
-                            if (currentSelectUser.equals(record.getSendUsername())){
+                            if ((currentSelectUser.equals(record.getSendUsername()) && (!record.getReceiveUsername().equals("测试群聊")))
+                                    || (currentSelectUser.equals("测试群聊") && record.getReceiveUsername().equals("测试群聊"))){
                                 if (record.getSendUsername().equals(currentUser)){
                                     chatArea.append("我: " + record.getMessage() + "\n");
                                 }else {

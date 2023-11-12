@@ -47,13 +47,19 @@ public class ChatRecordDaoImpl implements ChatRecordDao {
 
         try {
             conn = DBUtils.getConnection();
-            String sql = "select * from chat_record where (send_username = ? and receive_username = ?) or (send_username = ? and receive_username = ?)";
-            stmt = conn.prepareStatement(sql);
+            if ("测试群聊".equals(receiveUsername)){
+                String sql = "select * from chat_record where receive_username = ?";
+                stmt = conn.prepareStatement(sql);
+                stmt.setString(1, receiveUsername);
+            }else {
+                String sql = "select * from chat_record where (send_username = ? and receive_username = ?) or (send_username = ? and receive_username = ?)";
+                stmt = conn.prepareStatement(sql);
 
-            stmt.setString(1, sendUsername);
-            stmt.setString(2, receiveUsername);
-            stmt.setString(3, receiveUsername);
-            stmt.setString(4, sendUsername);
+                stmt.setString(1, sendUsername);
+                stmt.setString(2, receiveUsername);
+                stmt.setString(3, receiveUsername);
+                stmt.setString(4, sendUsername);
+            }
 
             rs = stmt.executeQuery();
 

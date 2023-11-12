@@ -35,6 +35,7 @@ public class ChatUI {
         DefaultListModel<String> listModel = new DefaultListModel<>();
         //拉取所有用户
         Action action = new Action("/getUserList",null,new Object[]{});
+        listModel.addElement("测试群聊");
         client.sendMsg(Protocol.toJsonStr(action));
         List<User> users = Protocol.toObjectAsListUserReference(client.receiveMsg().replace("\r\n", ""));
         for (User user : users) {
@@ -48,7 +49,7 @@ public class ChatUI {
             userList.setSelectedIndex(0);
             client.setCurrentSelectUser(userList.getSelectedValue());
             //拉取和列表第一个用户的聊天记录
-            records = getChatRecord(users.get(0).getUsername());
+            records = getChatRecord(userList.getSelectedValue());
         }
 
         // 右侧聊天框
