@@ -1,19 +1,33 @@
 package site.prodigal.ui;
 
+import site.prodigal.callback.CallbackCenter;
 import site.prodigal.client.TcpClient;
 import site.prodigal.entity.Action;
+import site.prodigal.entity.Result;
 import site.prodigal.serialization.Protocol;
 import site.prodigal.utils.ObjectUtils;
 
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.*;
 
 public class LoginUI {
-    private static TcpClient client = null;
+    public static TcpClient client = null;
+
     public static void main(String[] args) {
-        JFrame frame = new JFrame("登录界面");
+        new LoginUI();
+    }
+
+    public LoginUI(){
+        init();
+        CallbackCenter.register("loginUI",this);
+        client = new TcpClient();
+
+        //开始监听消息
+        client.startListening();
+    }
+    private JFrame frame;
+    private void init(){
+        frame = new JFrame("登录界面");
         frame.setSize(300, 200);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -21,10 +35,11 @@ public class LoginUI {
         frame.add(panel);
         placeComponents(panel,frame);
         frame.setVisible(true);
-        client = new TcpClient();
     }
 
-    private static void placeComponents(JPanel panel,JFrame frame) {
+    private JTextField userText;
+
+    private void placeComponents(JPanel panel,JFrame frame) {
 
         panel.setLayout(null);
 
@@ -32,7 +47,7 @@ public class LoginUI {
         userLabel.setBounds(10,20,80,25);
         panel.add(userLabel);
 
-        JTextField userText = new JTextField(20);
+        userText = new JTextField(20);
         userText.setBounds(100,20,165,25);
         panel.add(userText);
 
@@ -61,15 +76,19 @@ public class LoginUI {
                     return;
                 }
                 Action action = new Action("/login", new Object[]{username, password});
+                action.setCallback("loginUI");
                 client.sendMsg(Protocol.toJsonStr(action));
-
-                if ("true".equals(client.receiveMsg().replace("\r\n",""))){
-                    new ChatUI(username,client);
-                    frame.dispose();
-                }else {
-                    JOptionPane.showMessageDialog(panel, "用户名或者密码错误....");
-                }
             }
         });
+    }
+
+    public void callback(Result result){
+        if ("true".equals(result.getData())){
+            ChatUI obj = new ChatUI(userText.getText());
+            CallbackCenter.register("chatUI", obj);
+            frame.dispose();
+        }else {
+            JOptionPane.showMessageDialog(frame, "用户名或者密码错误....");
+        }
     }
 }

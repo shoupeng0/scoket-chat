@@ -14,8 +14,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Action {
     private String path;
+
     private String destination;
 
+    private String callback;
     private Object[] params;
 
     public Action(String path, Object[] params) {

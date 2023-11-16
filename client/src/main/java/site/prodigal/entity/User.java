@@ -4,12 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * @author ShouPeng
- * @date 2023/11/8 9:46
- * @email 7698627@qq.com
- */
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

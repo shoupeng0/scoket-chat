@@ -4,16 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * @author ShouPeng
- * @date 2023/10/31 15:16
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Action {
     private String path;
     private String destination;
+
+    private String callback;
 
     private Object[] params;
 
@@ -22,4 +20,9 @@ public class Action {
         this.params = params;
     }
 
+    public Action(String path, String destination, Object[] params) {
+        this.path = path;
+        this.destination = destination;
+        this.params = params;
+    }
 }

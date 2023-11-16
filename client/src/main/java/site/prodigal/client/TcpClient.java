@@ -1,28 +1,22 @@
 package site.prodigal.client;
 
 
-import site.prodigal.entity.ChatRecord;
+import site.prodigal.entity.Result;
 import site.prodigal.serialization.Protocol;
+import site.prodigal.callback.CallbackCenter;
+import site.prodigal.utils.ObjectUtils;
 
-import javax.swing.*;
-import java.io.InputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 public class TcpClient {
     private Socket socket;
 
-    private String currentSelectUser;
-    private Boolean isStart = false;
-
-    public void setCurrentSelectUser(String currentSelectUser) {
-        this.currentSelectUser = currentSelectUser;
-    }
-
     public TcpClient(){
         try {
             socket = new Socket("localhost", 8080);
             System.out.println("已连接到服务器!");
+
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -39,10 +33,7 @@ public class TcpClient {
         }
     }
 
-    public void setStart(Boolean start) {
-        isStart = start;
-    }
-
+    @Deprecated
     public String receiveMsg(){
         try{
             // 接收响应
@@ -55,40 +46,33 @@ public class TcpClient {
         }
     }
 
-    public void startListening(JTextArea chatArea,String currentUser) {
-        isStart = true;
+    public void startListening() {
         Thread listenerThread = new Thread(() -> {
+            System.out.println("start listening....");
             try {
-                byte[] buffer = new byte[8192];
                 while (true) {
                     InputStream inputStream = socket.getInputStream();
-                    if (inputStream.available() > 0 && isStart) {
+                    byte[] buffer = new byte[4096];
+                    if (inputStream.available() > 0) {
                         int length = inputStream.read(buffer);
                         if (length == -1) {
                             // 连接已关闭
                             break;
                         }
-                        String message = new String(buffer, 0, length);
-                        System.out.println("Received message: " + message);
-                        // 处理接收到的消息
-                        ChatRecord record = (ChatRecord) Protocol.toObject(message.replace("\r\n",""), ChatRecord.class);
 
-                        //排除自己发给自己的消息
-                        if (!record.getSendUsername().equals(currentUser)){
+                        String message = new String(buffer);
+                        Result res = (Result) Protocol.toObject(message, Result.class);
+                        System.out.println("Received message: " + res);
 
-                            //渲染到聊天界面上
-                            if ((currentSelectUser.equals(record.getSendUsername()) && (!record.getReceiveUsername().equals("测试群聊")))
-                                    || (currentSelectUser.equals("测试群聊") && record.getReceiveUsername().equals("测试群聊"))){
-                                if (record.getSendUsername().equals(currentUser)){
-                                    chatArea.append("我: " + record.getMessage() + "\n");
-                                }else {
-                                    chatArea.append(record.getSendUsername() + "：" + record.getMessage() + "\n");
-                                }
-                            }
+                        //处理消息
+                        if (ObjectUtils.isNotEmpty(res.getCallback())){
+                            Object obj = CallbackCenter.get(res.getCallback());
+                            obj.getClass().getMethod("callback",Result.class).invoke(obj,res);
                         }
+
                     } else {
                         // 避免频繁地检查
-                        Thread.sleep(100);
+                        Thread.sleep(300);
                     }
                 }
             } catch (Exception e) {

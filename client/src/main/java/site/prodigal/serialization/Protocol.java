@@ -8,12 +8,7 @@ import site.prodigal.entity.User;
 
 import java.util.List;
 
-/**
- * @author ShouPeng
- * @date 2023/10/31 15:08
- * @email 7698627@qq.com
- *
- */
+
 public class Protocol {
 
     private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
